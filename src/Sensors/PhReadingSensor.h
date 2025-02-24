@@ -1,6 +1,12 @@
 #include <Arduino.h>
 #pragma once
 
+enum CalibrationVoltage
+{
+    VOL_4,
+    VOL_6
+};
+
 class PhReadingSensor
 {
 public:
@@ -15,10 +21,4 @@ private:
     int ANALOG_PIN;
     float vol4, vol6, slope, offset;
     float readVoltage();
-};
-
-enum CalibrationVoltage
-{
-    VOL_4,
-    VOL_6
 };

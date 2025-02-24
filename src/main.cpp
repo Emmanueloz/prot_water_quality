@@ -1,21 +1,35 @@
 #include <Arduino.h>
+#include "Sensors/PhReadingSensor.h"
 
-// put function declarations here:
-int myFunction(int, int);
+PhReadingSensor phReadingSensor(A0);
 
 void setup()
 {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(9600);
+  Serial.println("Menu");
+  Serial.println("1. Calibrar voltage 4");
+  Serial.println("2. Calibrar voltage 6");
+  Serial.println("3. Medir ph");
+  Serial.println("4. Salir");
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-}
+  // menu para seleccionar la calibración o medir el ph
 
-// put function definitions here:
-int myFunction(int x, int y)
-{
-  return x + y;
+  int option = Serial.parseInt();
+
+  if (option == 1)
+  {
+    phReadingSensor.calibrate(VOL_4);
+  }
+  else if (option == 2)
+  {
+    phReadingSensor.calibrate(VOL_6);
+  }
+  else if (option == 3)
+  {
+    phReadingSensor.calculateCalibration();
+    Serial.println(phReadingSensor.getReadingFloat());
+  }
 }
