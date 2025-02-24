@@ -1,10 +1,14 @@
 #include <Arduino.h>
 #include "Sensors/PhReadingSensor.h"
+#include "Sensors/TotalDissolvedSolids.h"
 
+TotalDissolvedSolids sensorTDS(A0);
+unsigned long timeout = 0;
 PhReadingSensor phReadingSensor(A0);
 
 void setup()
 {
+  sensorTDS.setup();
   Serial.begin(9600);
   Serial.println("Menu");
   Serial.println("1. Calibrar voltage 4");
@@ -16,38 +20,44 @@ void setup()
 
 void loop()
 {
-  // menu para seleccionar la calibración o medir el ph
-
-  if (Serial.available())
+  if (timeout < millis())
   {
-
-    String command = Serial.readStringUntil('\n');
-
-    int option = command.substring(0, command.indexOf(',')).toInt();
-    float voltage = command.substring(command.indexOf(',') + 1).toFloat();
-
-    if (option == 1)
-    {
-      float voltage = phReadingSensor.calibrate(VOL_4);
-      Serial.println(voltage);
-    }
-    else if (option == 2)
-    {
-      float voltage = phReadingSensor.calibrate(VOL_6);
-      Serial.println(voltage);
-    }
-    else if (option == 3)
-    {
-      phReadingSensor.setVoltage(VOL_4, voltage);
-    }
-    else if (option == 4)
-    {
-      phReadingSensor.setVoltage(VOL_6, voltage);
-    }
-    else if (option == 5)
-    {
-      phReadingSensor.calculateCalibration();
-      Serial.println(phReadingSensor.getReadingFloat());
-    }
+    Serial.println(sensorTDS.getReading(6.0));
+    timeout = millis() + 1000;
   }
+}
+// menu para seleccionar la calibración o medir el ph
+
+if (Serial.available())
+{
+
+  String command = Serial.readStringUntil('\n');
+
+  int option = command.substring(0, command.indexOf(',')).toInt();
+  float voltage = command.substring(command.indexOf(',') + 1).toFloat();
+
+  if (option == 1)
+  {
+    float voltage = phReadingSensor.calibrate(VOL_4);
+    Serial.println(voltage);
+  }
+  else if (option == 2)
+  {
+    float voltage = phReadingSensor.calibrate(VOL_6);
+    Serial.println(voltage);
+  }
+  else if (option == 3)
+  {
+    phReadingSensor.setVoltage(VOL_4, voltage);
+  }
+  else if (option == 4)
+  {
+    phReadingSensor.setVoltage(VOL_6, voltage);
+  }
+  else if (option == 5)
+  {
+    phReadingSensor.calculateCalibration();
+    Serial.println(phReadingSensor.getReadingFloat());
+  }
+}
 }
