@@ -1,21 +1,27 @@
 #include <Arduino.h>
+#include "Sensors/TotalDissolvedSolids.h"
+#include "Sensors/TemperatureReadingSensor.h"
 
-// put function declarations here:
-int myFunction(int, int);
+// TotalDissolvedSolids sensorTDS(A0);
+TemperatureReadingSensor sensorTemp(2);
+
+unsigned long timeout = 0;
 
 void setup()
 {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  // sensorTDS.setup();
+  sensorTemp.begin();
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y)
-{
-  return x + y;
+  if (timeout < millis())
+  {
+    // Serial.println(sensorTDS.getReading(6.0));
+    // timeout = millis() + 1000;
+    float temp = sensorTemp.readTemperatureC();
+    Serial.print("Temperatura = ");
+    Serial.print(temp);
+    Serial.println(" °C");
+  }
 }
