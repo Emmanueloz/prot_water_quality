@@ -3,17 +3,15 @@
 #include "Sensors/PhReadingSensor.h"
 #include "Sensors/TotalDissolvedSolids.h"
 
-TurbidityReadingSensor sensor;
+TurbidityReadingSensor sensorTurbidity;
 TotalDissolvedSolids sensorTDS(A0);
 unsigned long timeout = 0;
 PhReadingSensor phReadingSensor(A0);
 
 void setup()
 {
-  Serial.begin(9600);
-  sensor.setup();
-  sensorTDS.setup();
-  Serial.begin(9600);
+  Serial.begin(115200);
+  sensorTurbidity.setup();
   Serial.println("Menu");
   Serial.println("1. Calibrar voltage 4");
   Serial.println("2. Calibrar voltage 6");
@@ -27,6 +25,7 @@ void loop()
   if (timeout < millis())
   {
     Serial.println(sensorTDS.getReading(6.0));
+    Serial.println(sensorTurbidity.getReading());
     timeout = millis() + 1000;
   }
 
@@ -64,8 +63,4 @@ void loop()
       Serial.println(phReadingSensor.getReadingFloat());
     }
   }
-}
-
-Serial.println(sensor.getReading());
-delay(500);
 }
