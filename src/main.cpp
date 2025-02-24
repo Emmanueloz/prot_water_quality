@@ -1,13 +1,17 @@
 #include <Arduino.h>
+#include "Sensors/TurbidityReadingSensor.h"
 #include "Sensors/PhReadingSensor.h"
 #include "Sensors/TotalDissolvedSolids.h"
 
+TurbidityReadingSensor sensor;
 TotalDissolvedSolids sensorTDS(A0);
 unsigned long timeout = 0;
 PhReadingSensor phReadingSensor(A0);
 
 void setup()
 {
+  Serial.begin(9600);
+  sensor.setup();
   sensorTDS.setup();
   Serial.begin(9600);
   Serial.println("Menu");
@@ -60,4 +64,8 @@ void loop()
       Serial.println(phReadingSensor.getReadingFloat());
     }
   }
+}
+
+Serial.println(sensor.getReading());
+delay(500);
 }
