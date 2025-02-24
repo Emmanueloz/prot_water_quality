@@ -25,39 +25,39 @@ void loop()
     Serial.println(sensorTDS.getReading(6.0));
     timeout = millis() + 1000;
   }
-}
-// menu para seleccionar la calibración o medir el ph
 
-if (Serial.available())
-{
+  // menu para seleccionar la calibración o medir el ph
 
-  String command = Serial.readStringUntil('\n');
+  if (Serial.available())
+  {
 
-  int option = command.substring(0, command.indexOf(',')).toInt();
-  float voltage = command.substring(command.indexOf(',') + 1).toFloat();
+    String command = Serial.readStringUntil('\n');
 
-  if (option == 1)
-  {
-    float voltage = phReadingSensor.calibrate(VOL_4);
-    Serial.println(voltage);
+    int option = command.substring(0, command.indexOf(',')).toInt();
+    float voltage = command.substring(command.indexOf(',') + 1).toFloat();
+
+    if (option == 1)
+    {
+      float voltage = phReadingSensor.calibrate(VOL_4);
+      Serial.println(voltage);
+    }
+    else if (option == 2)
+    {
+      float voltage = phReadingSensor.calibrate(VOL_6);
+      Serial.println(voltage);
+    }
+    else if (option == 3)
+    {
+      phReadingSensor.setVoltage(VOL_4, voltage);
+    }
+    else if (option == 4)
+    {
+      phReadingSensor.setVoltage(VOL_6, voltage);
+    }
+    else if (option == 5)
+    {
+      phReadingSensor.calculateCalibration();
+      Serial.println(phReadingSensor.getReadingFloat());
+    }
   }
-  else if (option == 2)
-  {
-    float voltage = phReadingSensor.calibrate(VOL_6);
-    Serial.println(voltage);
-  }
-  else if (option == 3)
-  {
-    phReadingSensor.setVoltage(VOL_4, voltage);
-  }
-  else if (option == 4)
-  {
-    phReadingSensor.setVoltage(VOL_6, voltage);
-  }
-  else if (option == 5)
-  {
-    phReadingSensor.calculateCalibration();
-    Serial.println(phReadingSensor.getReadingFloat());
-  }
-}
 }
