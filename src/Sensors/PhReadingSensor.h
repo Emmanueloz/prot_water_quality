@@ -11,7 +11,8 @@ class PhReadingSensor
 {
 public:
     PhReadingSensor(int analogPin);
-    void calibrate(CalibrationVoltage voltage);
+    float calibrate(CalibrationVoltage voltage);
+    void setVoltage(CalibrationVoltage type, float voltage);
     void calculateCalibration();
     String resultCalibration();
     String getReading();
