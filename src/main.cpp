@@ -17,8 +17,9 @@ void loop()
 {
   if (timeout < millis())
   {
+    Serial.begin(9600);
     // Serial.println(sensorTDS.getReading(6.0));
-    // timeout = millis() + 1000;
+    timeout = millis() + 1000;
     float temp = sensorTemp.readTemperatureC();
     Serial.print("Temperatura = ");
     Serial.print(temp);
