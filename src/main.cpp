@@ -2,65 +2,63 @@
 #include "Sensors/TurbidityReadingSensor.h"
 #include "Sensors/PhReadingSensor.h"
 #include "Sensors/TotalDissolvedSolids.h"
+#include "StateManager.h"
 
 TurbidityReadingSensor sensorTurbidity;
 TotalDissolvedSolids sensorTDS(A0);
 unsigned long timeout = 0;
 PhReadingSensor phReadingSensor(A0);
 
+StateManager stateManager;
+
+int counterMessage = 0;
+
 void setup()
 {
   Serial.begin(115200);
-  sensorTurbidity.setup();
-  Serial.println("Menu");
-  Serial.println("1. Calibrar voltage 4");
-  Serial.println("2. Calibrar voltage 6");
-  Serial.println("3. Set calibrate vol 4");
-  Serial.println("4. Set calibrate vol 6");
-  Serial.println("5. Medir ph");
+  Serial.println("Getting started");
+}
+
+void repose()
+{
+  if (counterMessage == 0)
+  {
+    Serial.println("Repose");
+    counterMessage++;
+  }
+}
+
+void calibrate()
+{
+  Serial.println("Calibrate");
+}
+
+void configure()
+{
+  Serial.println("Configure");
+}
+
+void reading()
+{
+  Serial.println("Reading");
 }
 
 void loop()
 {
-  if (timeout < millis())
+  State state = stateManager.getState();
+  switch (state)
   {
-    Serial.println(sensorTDS.getReading(6.0));
-    Serial.println(sensorTurbidity.getReading());
-    timeout = millis() + 1000;
-  }
-
-  // menu para seleccionar la calibración o medir el ph
-
-  if (Serial.available())
-  {
-
-    String command = Serial.readStringUntil('\n');
-
-    int option = command.substring(0, command.indexOf(',')).toInt();
-    float voltage = command.substring(command.indexOf(',') + 1).toFloat();
-
-    if (option == 1)
-    {
-      float voltage = phReadingSensor.calibrate(VOL_4);
-      Serial.println(voltage);
-    }
-    else if (option == 2)
-    {
-      float voltage = phReadingSensor.calibrate(VOL_6);
-      Serial.println(voltage);
-    }
-    else if (option == 3)
-    {
-      phReadingSensor.setVoltage(VOL_4, voltage);
-    }
-    else if (option == 4)
-    {
-      phReadingSensor.setVoltage(VOL_6, voltage);
-    }
-    else if (option == 5)
-    {
-      phReadingSensor.calculateCalibration();
-      Serial.println(phReadingSensor.getReadingFloat());
-    }
+  case REPOSE:
+    repose();
+    break;
+  case CALIBRATE:
+    calibrate();
+    break;
+  case CONFIGURE:
+    configure();
+    break;
+  case READING:
+    reading();
+    break;
   }
 }
