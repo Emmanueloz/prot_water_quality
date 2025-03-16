@@ -9,9 +9,9 @@ enum State
 class StateManager
 {
 private:
-    State state = REPOSE;
+    static State state;
 
 public:
-    void setState(State state);
-    State getState();
+    static void setState(State state);
+    static State getState();
 };

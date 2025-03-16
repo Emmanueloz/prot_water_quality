@@ -9,14 +9,13 @@ TotalDissolvedSolids sensorTDS(A0);
 unsigned long timeout = 0;
 PhReadingSensor phReadingSensor(A0);
 
-StateManager stateManager;
-
 int counterMessage = 0;
 
 void setup()
 {
   Serial.begin(115200);
   Serial.println("Getting started");
+  // StateManager::setState(CALIBRATE);
 }
 
 void repose()
@@ -45,8 +44,7 @@ void reading()
 
 void loop()
 {
-  State state = stateManager.getState();
-  switch (state)
+  switch (StateManager::getState())
   {
   case REPOSE:
     repose();
