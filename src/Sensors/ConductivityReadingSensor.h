@@ -3,11 +3,14 @@
 
 class ConductivityReadingSensor
 {
+
+private:
+    int sensorPin;
+
 public:
-    ConductivityReadingSensor();
+    ConductivityReadingSensor(int pin = A0);
     void setup();
-    void calibrate();
-    String resultCalibrate();
     String getReading();
     int getReadingInt();
+    float getReadingFloat();
 };

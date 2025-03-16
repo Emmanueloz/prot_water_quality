@@ -1,28 +1,33 @@
 #include "ConductivityReadingSensor.h"
 
-ConductivityReadingSensor::ConductivityReadingSensor()
+ConductivityReadingSensor::ConductivityReadingSensor(int pin) : sensorPin(pin)
 {
 }
 
 void ConductivityReadingSensor::setup()
 {
-}
-
-void ConductivityReadingSensor::calibrate()
-{
-}
-
-String ConductivityReadingSensor::resultCalibrate()
-{
-    return String();
+    pinMode(sensorPin, INPUT);
 }
 
 String ConductivityReadingSensor::getReading()
 {
-    return String();
+    int sensorValue = getReadingInt();
+    float voltage = getReadingFloat();
+
+    String result = "Valor del sensor: " + String(sensorValue);
+    result += "  - Voltaje: " + String(voltage) + " V";
+
+    return result;
 }
 
 int ConductivityReadingSensor::getReadingInt()
 {
-    return 0;
+    return analogRead(sensorPin);
+}
+
+float ConductivityReadingSensor::getReadingFloat()
+{
+    int sensorValue = analogRead(sensorPin);
+    float voltage = sensorValue * (5.0 / 1023.0);
+    return voltage;
 }
