@@ -77,10 +77,9 @@ RGB ColorTCS3200::getRGB()
     getFrequencies(redFreq, greenFreq, blueFreq);
 
     // Valores de calibración (mínimo y máximo) para cada canal.
-    // Estos valores son de ejemplo y deberán ajustarse en función de tu entorno y pruebas.
-    const float redMin = 27777.78, redMax = 100000.00;
-    const float greenMin = 22727.27, greenMax = 100000.00;
-    const float blueMin = 27777.7, blueMax = 100000.00;
+    const float redMin = 2500.0, redMax = 20000.0;
+    const float greenMin = 2000.0, greenMax = 15000.0;
+    const float blueMin = 2500.0, blueMax = 12000.0;
     Serial.print("redFreq: ");
     Serial.print(redFreq);
     Serial.print(" | greenFreq: ");
