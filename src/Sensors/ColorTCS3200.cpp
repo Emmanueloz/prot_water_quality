@@ -21,21 +21,12 @@ float ColorTCS3200::readFrequency(uint8_t s2State, uint8_t s3State)
     digitalWrite(_s2, s2State);
     digitalWrite(_s3, s3State);
 
-    // Espera activa utilizando millis() en lugar de delay(10)
-    unsigned long startTime = millis();
-    while (millis() - startTime < 10)
-    {
-    }
+    delayMicroseconds(200); // Espera reducida acorde al datasheet
 
-    // Medimos el período del pulso (en microsegundos)
-    unsigned long period = pulseIn(_out, digitalRead(_out) == HIGH ? LOW : HIGH);
-
-    if (period == 0)
+    unsigned long pulseWidth = pulseIn(_out, digitalRead(_out) == HIGH ? LOW : HIGH, 100000);
+    if (pulseWidth == 0)
         return 0;
-
-    // Convertimos el período a frecuencia (Hz):
-    // frecuencia = 1.000.000 / período (ya que el período está en microsegundos)
-    return 1000000.0 / period;
+    return 1000000.0 / (pulseWidth * 2); // Período completo
 }
 
 void ColorTCS3200::getFrequencies(float &redFreq, float &greenFreq, float &blueFreq)
@@ -87,9 +78,9 @@ RGB ColorTCS3200::getRGB()
 
     // Valores de calibración (mínimo y máximo) para cada canal.
     // Estos valores son de ejemplo y deberán ajustarse en función de tu entorno y pruebas.
-    const float redMin = 17543.86, redMax = 90909.10;
-    const float greenMin = 14705.88, greenMax = 111111.11;
-    const float blueMin = 27777.7, blueMax = 83333.34;
+    const float redMin = 27777.78, redMax = 100000.00;
+    const float greenMin = 22727.27, greenMax = 100000.00;
+    const float blueMin = 27777.7, blueMax = 100000.00;
     Serial.print("redFreq: ");
     Serial.print(redFreq);
     Serial.print(" | greenFreq: ");
