@@ -4,6 +4,7 @@
 #include "Sensors/TotalDissolvedSolids.h"
 #include "StateManager.h"
 #include "ConfigStoredROM.h"
+#include "CommandManager.h"
 
 TurbidityReadingSensor sensorTurbidity;
 TotalDissolvedSolids sensorTDS(A0);
@@ -22,13 +23,9 @@ void repose()
 {
   if (Serial.available())
   {
-    String command = Serial.readStringUntil('\n');
-    command.trim();
-    int separator = command.indexOf(':');
-    String commandName = command.substring(0, separator);
-    String commandValue = command.substring(separator + 1);
+    Command command = CommandManager::getCommand();
 
-    if (commandName == "getConfig")
+    if (command.name == "getConfig")
     {
       Serial.println("Config");
       Config config = ConfigStoredROM::getConfig();
@@ -39,17 +36,17 @@ void repose()
       Serial.print("Calibration Vol6: ");
       Serial.println(config.calibrationVol6);
     }
-    else if (commandName == "setApiKey")
+    else if (command.name == "setApiKey")
     {
-      ConfigStoredROM::setApiKey(commandValue);
+      ConfigStoredROM::setApiKey(command.value);
     }
-    else if (commandName == "phCalibrateVol4")
+    else if (command.name == "phCalibrateVol4")
     {
-      ConfigStoredROM::setCalibrationVol4(commandValue.toFloat());
+      ConfigStoredROM::setCalibrationVol4(command.value.toFloat());
     }
-    else if (commandName == "phCalibrateVol6")
+    else if (command.name == "phCalibrateVol6")
     {
-      ConfigStoredROM::setCalibrationVol6(commandValue.toFloat());
+      ConfigStoredROM::setCalibrationVol6(command.value.toFloat());
     }
   }
 }
