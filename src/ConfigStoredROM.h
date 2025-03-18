@@ -1,0 +1,25 @@
+#include <Arduino.h>
+#pragma once
+
+struct Config
+{
+    char apiKey[100];
+    float calibrationVol4;
+    float calibrationVol6;
+};
+
+class ConfigStoredROM
+{
+private:
+    static const int EEPROM_START = 0;
+    static Config config;
+    static bool loaded;
+    static void saveToEEPROM();
+
+public:
+    static void setConfig(Config config);
+    static Config getConfig();
+    static void setApiKey(String apiKey);
+    static void setCalibrationVol4(float calibrationVol4);
+    static void setCalibrationVol6(float calibrationVol6);
+};
