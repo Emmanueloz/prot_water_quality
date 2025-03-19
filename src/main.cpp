@@ -1,27 +1,43 @@
 #include <Arduino.h>
+// Sensores
 #include "Sensors/TurbidityReadingSensor.h"
 #include "Sensors/PhReadingSensor.h"
 #include "Sensors/TotalDissolvedSolids.h"
-#include "StateManager.h"
-#include "ConfigStoredROM.h"
-#include "CommandManager.h"
 #include "Sensors/ColorTCS3200.h"
-
-TurbidityReadingSensor sensorTurbidity;
-TotalDissolvedSolids sensorTDS(A0);
-// TotalDissolvedSolids sensorTDS(A0);
-ColorTCS3200 sensorColor(8, 9, 10, 11, 12);
-unsigned long timeout = 0;
-PhReadingSensor phReadingSensor(A0);
-
-int counterMessage = 0;
 #include "Sensors/ConductivityReadingSensor.h"
 
-ConductivityReadingSensor sensor;
+// Estados del sistema
+#include "StateManager.h"
+#include "CommandManager.h"
+#include "ConfigStoredROM.h"
+
+// Pines de los sensores
+// Analog
+const int ANALOG_PIN_TURBIDITY = A0;
+const int ANALOG_PIN_TDS = A1;
+const int ANALOG_PIN_PH = A2;
+const int ANALOG_PIN_CONDUCTIVITY = A3;
+// Digital
+const uint8_t DIGITAL_PIN_S0_COLOR = 8;
+const uint8_t DIGITAL_PIN_S1_COLOR = 9;
+const uint8_t DIGITAL_PIN_S2_COLOR = 10;
+const uint8_t DIGITAL_PIN_S3_COLOR = 11;
+const uint8_t DIGITAL_PIN_OUT_COLOR = 12;
+
+// Instancias de los sensores
+TurbidityReadingSensor sensorTurbidity(ANALOG_PIN_TURBIDITY);
+TotalDissolvedSolids sensorTDS(ANALOG_PIN_TDS);
+PhReadingSensor phReadingSensor(ANALOG_PIN_PH);
+ConductivityReadingSensor sensorConductivity(ANALOG_PIN_CONDUCTIVITY);
+ColorTCS3200 sensorColor(DIGITAL_PIN_S0_COLOR, DIGITAL_PIN_S1_COLOR, DIGITAL_PIN_S2_COLOR, DIGITAL_PIN_S3_COLOR,
+                         DIGITAL_PIN_OUT_COLOR);
 
 void setup()
 {
   Serial.begin(115200);
+  sensorTurbidity.setup();
+  sensorConductivity.setup();
+  sensorColor.setup();
   Serial.println("Getting started");
 }
 

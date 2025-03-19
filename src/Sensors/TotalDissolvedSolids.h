@@ -11,7 +11,6 @@ private:
 
 public:
     TotalDissolvedSolids(int pin);
-    void setup();
     String getReading(float temperature);
     float getReadingFloat(float temperature);
 };

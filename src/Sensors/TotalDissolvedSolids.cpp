@@ -2,11 +2,6 @@
 
 TotalDissolvedSolids::TotalDissolvedSolids(int pin) : pin(pin), tds(pin) {}
 
-void TotalDissolvedSolids::setup()
-{
-    Serial.begin(115200);
-}
-
 float TotalDissolvedSolids::getReadingFloat(float temperature)
 {
     return tds.update(temperature);
