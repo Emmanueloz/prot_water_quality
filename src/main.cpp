@@ -5,9 +5,12 @@
 #include "StateManager.h"
 #include "ConfigStoredROM.h"
 #include "CommandManager.h"
+#include "Sensors/ColorTCS3200.h"
 
 TurbidityReadingSensor sensorTurbidity;
 TotalDissolvedSolids sensorTDS(A0);
+// TotalDissolvedSolids sensorTDS(A0);
+ColorTCS3200 sensorColor(8, 9, 10, 11, 12);
 unsigned long timeout = 0;
 PhReadingSensor phReadingSensor(A0);
 
