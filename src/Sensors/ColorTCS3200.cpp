@@ -80,12 +80,6 @@ RGB ColorTCS3200::getRGB()
     const float redMin = 2500.0, redMax = 20000.0;
     const float greenMin = 2000.0, greenMax = 15000.0;
     const float blueMin = 2500.0, blueMax = 12000.0;
-    Serial.print("redFreq: ");
-    Serial.print(redFreq);
-    Serial.print(" | greenFreq: ");
-    Serial.print(greenFreq);
-    Serial.print(" | blueFreq: ");
-    Serial.println(blueFreq);
 
     uint8_t r = mapFloat(redFreq, redMin, redMax, 0, 255);
     uint8_t g = mapFloat(greenFreq, greenMin, greenMax, 0, 255);
