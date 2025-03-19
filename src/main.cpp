@@ -12,6 +12,9 @@ unsigned long timeout = 0;
 PhReadingSensor phReadingSensor(A0);
 
 int counterMessage = 0;
+#include "Sensors/ConductivityReadingSensor.h"
+
+ConductivityReadingSensor sensor;
 
 void setup()
 {
