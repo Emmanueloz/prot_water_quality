@@ -5,7 +5,6 @@ ColorTCS3200::ColorTCS3200(uint8_t s0, uint8_t s1, uint8_t s2, uint8_t s3, uint8
 
 void ColorTCS3200::setup()
 {
-    Serial.begin(9600);
     pinMode(_s0, OUTPUT);
     pinMode(_s1, OUTPUT);
     pinMode(_s2, OUTPUT);
