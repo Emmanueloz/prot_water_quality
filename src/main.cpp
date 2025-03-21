@@ -15,7 +15,7 @@
 // Analog
 const int ANALOG_PIN_TURBIDITY = A0;
 const int ANALOG_PIN_TDS = A1;
-const int ANALOG_PIN_PH = A2;
+const int ANALOG_PIN_PH = A8;
 const int ANALOG_PIN_CONDUCTIVITY = A3;
 // Digital
 const uint8_t DIGITAL_PIN_S0_COLOR = 8;
