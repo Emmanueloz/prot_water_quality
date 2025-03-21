@@ -14,7 +14,6 @@ float PhReadingSensor::readVoltage()
 
 float PhReadingSensor::calibrate(CalibrationVoltage voltage)
 {
-
     if (voltage == VOL_4)
     {
         Serial.println("Calibrating voltage 4");
@@ -27,7 +26,6 @@ float PhReadingSensor::calibrate(CalibrationVoltage voltage)
         vol6 = readVoltage();
         return vol6;
     }
-
     return 0;
 }
 
@@ -55,12 +53,15 @@ void PhReadingSensor::calculateCalibration()
 
 String PhReadingSensor::resultCalibration()
 {
-    return String();
+    // Implementar para devolver información útil sobre la calibración
+    return "Slope: " + String(slope) + ", Offset: " + String(offset);
 }
 
 String PhReadingSensor::getReading()
 {
-    return String();
+    // Implementar para devolver el valor de pH como String
+    float ph = getReadingFloat();
+    return "pH: " + String(ph, 2); // 2 decimales
 }
 
 float PhReadingSensor::getReadingFloat()
