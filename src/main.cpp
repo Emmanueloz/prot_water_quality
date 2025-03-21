@@ -54,7 +54,7 @@ void initialize()
   }
 
   Serial.print("State: ");
-  Serial.println(StateManager::getState());
+  Serial.println(StateManager::getStateString());
 }
 
 void setup()
