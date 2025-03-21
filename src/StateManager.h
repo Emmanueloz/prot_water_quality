@@ -2,6 +2,7 @@
 
 enum State
 {
+    INITIALIZE,
     REPOSE,
     CALIBRATE,
     CONFIGURE,
@@ -11,7 +12,7 @@ enum State
 class StateManager
 {
 private:
-    static State state;
+    static State _state;
 
 public:
     static void setState(State state);

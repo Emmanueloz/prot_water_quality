@@ -1,13 +1,13 @@
 #include "StateManager.h"
 
-State StateManager::state = REPOSE;
+State StateManager::_state = INITIALIZE;
 
 void StateManager::setState(State state)
 {
-    StateManager::state = state;
+    StateManager::_state = state;
 }
 
 State StateManager::getState()
 {
-    return StateManager::state;
+    return StateManager::_state;
 }

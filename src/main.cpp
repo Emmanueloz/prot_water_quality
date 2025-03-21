@@ -32,6 +32,31 @@ ConductivityReadingSensor sensorConductivity(ANALOG_PIN_CONDUCTIVITY);
 ColorTCS3200 sensorColor(DIGITAL_PIN_S0_COLOR, DIGITAL_PIN_S1_COLOR, DIGITAL_PIN_S2_COLOR, DIGITAL_PIN_S3_COLOR,
                          DIGITAL_PIN_OUT_COLOR);
 
+void initialize()
+{
+  Config config = ConfigStoredROM::getConfig();
+  if (strlen(config.apiKey) == 0)
+  {
+    Serial.println("No API key");
+    StateManager::setState(CONFIGURE);
+  }
+  else if (config.calibrationVol4 == 0.0 || config.calibrationVol6 == 0.0)
+  {
+    Serial.println("No calibration");
+    StateManager::setState(CALIBRATE);
+  }
+  else
+  {
+    phReadingSensor.setVoltage(VOL_4, config.calibrationVol4);
+    phReadingSensor.setVoltage(VOL_6, config.calibrationVol6);
+    phReadingSensor.calculateCalibration();
+    StateManager::setState(REPOSE);
+  }
+
+  Serial.print("State: ");
+  Serial.println(StateManager::getState());
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -39,6 +64,7 @@ void setup()
   sensorConductivity.setup();
   sensorColor.setup();
   Serial.println("Getting started");
+  initialize();
 }
 
 void repose()
@@ -58,29 +84,96 @@ void repose()
       Serial.print("Calibration Vol6: ");
       Serial.println(config.calibrationVol6);
     }
-    else if (command.name == "setApiKey")
+    else if (command.name == "resultCalibration")
     {
-      ConfigStoredROM::setApiKey(command.value);
+      Serial.println("Result Calibration");
+      Serial.print(phReadingSensor.resultCalibration());
     }
-    else if (command.name == "phCalibrateVol4")
+
+    else if (command.name == "configure")
     {
-      ConfigStoredROM::setCalibrationVol4(command.value.toFloat());
+      Serial.println("Configure");
+      StateManager::setState(CONFIGURE);
     }
-    else if (command.name == "phCalibrateVol6")
+    else if (command.name == "calibrate")
     {
-      ConfigStoredROM::setCalibrationVol6(command.value.toFloat());
+      Serial.println("Calibrate");
+      StateManager::setState(CALIBRATE);
+    }
+    else if (command.name == "reading")
+    {
+      Serial.println("Reading");
+      StateManager::setState(READING);
     }
   }
 }
 
 void calibrate()
 {
-  Serial.println("Calibrate");
+  if (Serial.available())
+  {
+    Command command = CommandManager::getCommand();
+
+    if (command.name == "phCalibrateVol4")
+    {
+      Serial.println("Calibrating vol4");
+      float voltage = phReadingSensor.calibrate(VOL_4);
+      ConfigStoredROM::setCalibrationVol4(voltage);
+    }
+    else if (command.name == "phCalibrateVol6")
+    {
+      Serial.println("Calibrating vol6");
+      float voltage = phReadingSensor.calibrate(VOL_6);
+      ConfigStoredROM::setCalibrationVol6(voltage);
+    }
+    else if (command.name == "phCalibrate")
+    {
+      Serial.println("Calibrating");
+      phReadingSensor.calculateCalibration();
+    }
+    else if (command.name == "phCalibrateResult")
+    {
+      Serial.println("Calibration result");
+      Serial.print(phReadingSensor.resultCalibration());
+    }
+    else if (command.name == "phSetVol4")
+    {
+      Serial.println("Setting vol4");
+      phReadingSensor.setVoltage(VOL_4, command.value.toFloat());
+      ConfigStoredROM::setCalibrationVol4(command.value.toFloat());
+    }
+    else if (command.name == "phSetVol6")
+    {
+      Serial.println("Setting vol6");
+      phReadingSensor.setVoltage(VOL_6, command.value.toFloat());
+      ConfigStoredROM::setCalibrationVol6(command.value.toFloat());
+    }
+    else if (command.name == "calibrateFinished")
+    {
+      Serial.println("Calibration finished");
+      StateManager::setState(INITIALIZE);
+    }
+  }
 }
 
 void configure()
 {
-  Serial.println("Configure");
+  if (Serial.available())
+  {
+    Command command = CommandManager::getCommand();
+
+    if (command.name == "setApiKey")
+    {
+      Serial.println("Setting API key");
+      Serial.println(command.value);
+      ConfigStoredROM::setApiKey(command.value);
+    }
+    else if (command.name == "configureFinished")
+    {
+      Serial.println("Configuration finished");
+      StateManager::setState(INITIALIZE);
+    }
+  }
 }
 
 void reading()
@@ -92,6 +185,9 @@ void loop()
 {
   switch (StateManager::getState())
   {
+  case INITIALIZE:
+    initialize();
+    break;
   case REPOSE:
     repose();
     break;
