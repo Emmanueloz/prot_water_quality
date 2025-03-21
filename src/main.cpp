@@ -86,10 +86,14 @@ void repose()
     }
     else if (command.name == "resultCalibration")
     {
-      Serial.println("Result Calibration");
-      Serial.print(phReadingSensor.resultCalibration());
+      Serial.print("Result Calibration: ");
+      Serial.println(phReadingSensor.resultCalibration());
     }
-
+    else if (command.name == "getStatus")
+    {
+      Serial.print("State: ");
+      Serial.println(StateManager::getStateString());
+    }
     else if (command.name == "configure")
     {
       Serial.println("Configure");

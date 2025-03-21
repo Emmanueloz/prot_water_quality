@@ -33,15 +33,11 @@ void PhReadingSensor::setVoltage(CalibrationVoltage type, float voltage)
 {
     if (type == VOL_4)
     {
-        Serial.println("Setting voltage 4");
         vol4 = voltage;
-        Serial.println(vol4);
     }
     else if (type == VOL_6)
     {
-        Serial.println("Setting voltage 6");
         vol6 = voltage;
-        Serial.println(vol6);
     }
 }
 
