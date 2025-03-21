@@ -1,4 +1,4 @@
-#ifndef TemperatureReadingSensor_h
+#pragma once
 #define TemperatureReadingSensor_h
 
 #include <OneWire.h>
@@ -16,5 +16,3 @@ public:
     void begin();                          // Inicialización
     float readTemperatureC();              // Obtener temperatura en °C
 };
-
-#endif
