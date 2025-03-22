@@ -24,6 +24,13 @@ const uint8_t DIGITAL_PIN_S2_COLOR = 10;
 const uint8_t DIGITAL_PIN_S3_COLOR = 11;
 const uint8_t DIGITAL_PIN_OUT_COLOR = 12;
 
+// Constantes
+const int WAIT_TIME = 5000;
+
+// Variables
+unsigned long lastTime = 0;
+unsigned int readings = 1;
+
 // Instancias de los sensores
 TurbidityReadingSensor sensorTurbidity(ANALOG_PIN_TURBIDITY);
 TotalDissolvedSolids sensorTDS(ANALOG_PIN_TDS);
@@ -106,8 +113,9 @@ void repose()
     }
     else if (command.name == "reading")
     {
-      Serial.println("Reading");
+      Serial.println("Reading started");
       StateManager::setState(READING);
+      lastTime = millis();
     }
   }
 }
@@ -182,7 +190,25 @@ void configure()
 
 void reading()
 {
-  Serial.println("Reading");
+  if (Serial.available())
+  {
+    Command command = CommandManager::getCommand();
+    if (command.name == "readingFinished")
+    {
+      Serial.println("Reading finished");
+      StateManager::setState(REPOSE);
+      readings = 1;
+      return;
+    }
+  }
+
+  if (millis() - lastTime > WAIT_TIME)
+  {
+    lastTime = millis();
+
+    Serial.println("Reading " + String(readings));
+    readings++;
+  }
 }
 
 void loop()
