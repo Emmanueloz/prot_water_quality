@@ -1,18 +1,20 @@
 #pragma once
-#define TemperatureReadingSensor_h
-
+#include <Arduino.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-class TemperatureReadingSensor
+class TempReader
 {
-private:
-    OneWire oneWire;           // Objeto OneWire
-    DallasTemperature sensors; // Objeto DallasTemperature
-    float getTemperature();    // Lectura de temperatura
-
 public:
-    TemperatureReadingSensor(uint8_t pin); // Constructor
-    void begin();                          // Inicialización
-    float readTemperatureC();              // Obtener temperatura en °C
+    TempReader();
+    void begin();   // Combina inicialización y chequeo
+    void monitor(); // Maneja lectura y despliegue
+
+private:
+    OneWire wireBus;
+    DallasTemperature ds18b20;
+    bool sensorOK;
+
+    float readTemp();
+    void checkSensor();
 };
