@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "Sensors/TemperatureReadingSensor.h"
 
-TempReader sensor; // Única instancia global
+TemperatureReadingSensor sensor; // Única instancia global
 
 void setup()
 {
@@ -10,5 +10,5 @@ void setup()
 
 void loop()
 {
-    sensor.monitor(); // Lee y muestra la temperatura
+    sensor.getReadingFloat(); // Lee y muestra la temperatura
 }

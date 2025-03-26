@@ -3,18 +3,12 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-class TempReader
+class TemperatureReadingSensor
 {
 public:
-    TempReader();
-    void begin();   // Combina inicialización y chequeo
-    void monitor(); // Maneja lectura y despliegue
-
-private:
+    TemperatureReadingSensor();
+    void begin();
+    float getReadingFloat();
     OneWire wireBus;
     DallasTemperature ds18b20;
-    bool sensorOK;
-
-    float readTemp();
-    void checkSensor();
 };
