@@ -4,6 +4,7 @@
 #include "Sensors/PhReadingSensor.h"
 #include "Sensors/TotalDissolvedSolids.h"
 #include "Sensors/ColorTCS3200.h"
+#include "Sensors/TemperatureReadingSensor.h"
 #include "Sensors/ConductivityReadingSensor.h"
 
 // Estados del sistema
@@ -18,6 +19,8 @@ const int ANALOG_PIN_TDS = A1;
 const int ANALOG_PIN_PH = A8;
 const int ANALOG_PIN_CONDUCTIVITY = A3;
 // Digital
+const uint8_t DIGITAL_PIN_TEMP = 2;
+
 const uint8_t DIGITAL_PIN_S0_COLOR = 8;
 const uint8_t DIGITAL_PIN_S1_COLOR = 9;
 const uint8_t DIGITAL_PIN_S2_COLOR = 10;
@@ -38,6 +41,7 @@ PhReadingSensor phReadingSensor(ANALOG_PIN_PH);
 ConductivityReadingSensor sensorConductivity(ANALOG_PIN_CONDUCTIVITY);
 ColorTCS3200 sensorColor(DIGITAL_PIN_S0_COLOR, DIGITAL_PIN_S1_COLOR, DIGITAL_PIN_S2_COLOR, DIGITAL_PIN_S3_COLOR,
                          DIGITAL_PIN_OUT_COLOR);
+TemperatureReadingSensor sensorTMP(DIGITAL_PIN_TEMP);
 
 void initialize()
 {
@@ -63,9 +67,6 @@ void initialize()
     Serial.print("State: ");
     Serial.println(StateManager::getStateString());
 }
-#include "Sensors/TemperatureReadingSensor.h"
-
-TemperatureReadingSensor sensor; // Única instancia global
 
 void setup()
 {
@@ -73,6 +74,7 @@ void setup()
     sensorTurbidity.setup();
     sensorConductivity.setup();
     sensorColor.setup();
+    sensorTMP.begin();
     Serial.println("Getting started");
     initialize();
 }

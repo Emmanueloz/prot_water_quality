@@ -1,11 +1,10 @@
 #include "TemperatureReadingSensor.h"
 
-TemperatureReadingSensor::TemperatureReadingSensor()
-    : wireBus(2), ds18b20(&wireBus) {}
+TemperatureReadingSensor::TemperatureReadingSensor(uint8_t pin)
+    : wireBus(pin), ds18b20(&wireBus) {}
 
 void TemperatureReadingSensor::begin()
 {
-    Serial.begin(9600);
     ds18b20.begin();
 }
 

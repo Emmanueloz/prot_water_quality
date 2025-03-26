@@ -6,7 +6,7 @@
 class TemperatureReadingSensor
 {
 public:
-    TemperatureReadingSensor();
+    TemperatureReadingSensor(uint8_t pin);
     void begin();
     float getReadingFloat();
     OneWire wireBus;
