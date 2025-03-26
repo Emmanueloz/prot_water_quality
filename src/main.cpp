@@ -41,194 +41,197 @@ ColorTCS3200 sensorColor(DIGITAL_PIN_S0_COLOR, DIGITAL_PIN_S1_COLOR, DIGITAL_PIN
 
 void initialize()
 {
-  Config config = ConfigStoredROM::getConfig();
-  if (strlen(config.apiKey) == 0)
-  {
-    Serial.println("No API key");
-    StateManager::setState(CONFIGURE);
-  }
-  else if (config.calibrationVol4 == 0.0 || config.calibrationVol6 == 0.0)
-  {
-    Serial.println("No calibration");
-    StateManager::setState(CALIBRATE);
-  }
-  else
-  {
-    phReadingSensor.setVoltage(VOL_4, config.calibrationVol4);
-    phReadingSensor.setVoltage(VOL_6, config.calibrationVol6);
-    phReadingSensor.calculateCalibration();
-    StateManager::setState(REPOSE);
-  }
+    Config config = ConfigStoredROM::getConfig();
+    if (strlen(config.apiKey) == 0)
+    {
+        Serial.println("No API key");
+        StateManager::setState(CONFIGURE);
+    }
+    else if (config.calibrationVol4 == 0.0 || config.calibrationVol6 == 0.0)
+    {
+        Serial.println("No calibration");
+        StateManager::setState(CALIBRATE);
+    }
+    else
+    {
+        phReadingSensor.setVoltage(VOL_4, config.calibrationVol4);
+        phReadingSensor.setVoltage(VOL_6, config.calibrationVol6);
+        phReadingSensor.calculateCalibration();
+        StateManager::setState(REPOSE);
+    }
 
-  Serial.print("State: ");
-  Serial.println(StateManager::getStateString());
+    Serial.print("State: ");
+    Serial.println(StateManager::getStateString());
 }
+#include "Sensors/TemperatureReadingSensor.h"
+
+TemperatureReadingSensor sensor; // Única instancia global
 
 void setup()
 {
-  Serial.begin(115200);
-  sensorTurbidity.setup();
-  sensorConductivity.setup();
-  sensorColor.setup();
-  Serial.println("Getting started");
-  initialize();
+    Serial.begin(115200);
+    sensorTurbidity.setup();
+    sensorConductivity.setup();
+    sensorColor.setup();
+    Serial.println("Getting started");
+    initialize();
 }
 
 void repose()
 {
-  if (Serial.available())
-  {
-    Command command = CommandManager::getCommand();
+    if (Serial.available())
+    {
+        Command command = CommandManager::getCommand();
 
-    if (command.name == "getConfig")
-    {
-      Serial.println("Config");
-      Config config = ConfigStoredROM::getConfig();
-      Serial.print("API Key: ");
-      Serial.println(config.apiKey);
-      Serial.print("Calibration Vol4: ");
-      Serial.println(config.calibrationVol4);
-      Serial.print("Calibration Vol6: ");
-      Serial.println(config.calibrationVol6);
+        if (command.name == "getConfig")
+        {
+            Serial.println("Config");
+            Config config = ConfigStoredROM::getConfig();
+            Serial.print("API Key: ");
+            Serial.println(config.apiKey);
+            Serial.print("Calibration Vol4: ");
+            Serial.println(config.calibrationVol4);
+            Serial.print("Calibration Vol6: ");
+            Serial.println(config.calibrationVol6);
+        }
+        else if (command.name == "resultCalibration")
+        {
+            Serial.print("Result Calibration: ");
+            Serial.println(phReadingSensor.resultCalibration());
+        }
+        else if (command.name == "getStatus")
+        {
+            Serial.print("State: ");
+            Serial.println(StateManager::getStateString());
+        }
+        else if (command.name == "configure")
+        {
+            Serial.println("Configure");
+            StateManager::setState(CONFIGURE);
+        }
+        else if (command.name == "calibrate")
+        {
+            Serial.println("Calibrate");
+            StateManager::setState(CALIBRATE);
+        }
+        else if (command.name == "reading")
+        {
+            Serial.println("Reading started");
+            StateManager::setState(READING);
+            lastTime = millis();
+        }
     }
-    else if (command.name == "resultCalibration")
-    {
-      Serial.print("Result Calibration: ");
-      Serial.println(phReadingSensor.resultCalibration());
-    }
-    else if (command.name == "getStatus")
-    {
-      Serial.print("State: ");
-      Serial.println(StateManager::getStateString());
-    }
-    else if (command.name == "configure")
-    {
-      Serial.println("Configure");
-      StateManager::setState(CONFIGURE);
-    }
-    else if (command.name == "calibrate")
-    {
-      Serial.println("Calibrate");
-      StateManager::setState(CALIBRATE);
-    }
-    else if (command.name == "reading")
-    {
-      Serial.println("Reading started");
-      StateManager::setState(READING);
-      lastTime = millis();
-    }
-  }
 }
 
 void calibrate()
 {
-  if (Serial.available())
-  {
-    Command command = CommandManager::getCommand();
+    if (Serial.available())
+    {
+        Command command = CommandManager::getCommand();
 
-    if (command.name == "phCalibrateVol4")
-    {
-      Serial.println("Calibrating vol4");
-      float voltage = phReadingSensor.calibrate(VOL_4);
-      ConfigStoredROM::setCalibrationVol4(voltage);
+        if (command.name == "phCalibrateVol4")
+        {
+            Serial.println("Calibrating vol4");
+            float voltage = phReadingSensor.calibrate(VOL_4);
+            ConfigStoredROM::setCalibrationVol4(voltage);
+        }
+        else if (command.name == "phCalibrateVol6")
+        {
+            Serial.println("Calibrating vol6");
+            float voltage = phReadingSensor.calibrate(VOL_6);
+            ConfigStoredROM::setCalibrationVol6(voltage);
+        }
+        else if (command.name == "phCalibrate")
+        {
+            Serial.println("Calibrating");
+            phReadingSensor.calculateCalibration();
+        }
+        else if (command.name == "phCalibrateResult")
+        {
+            Serial.println("Calibration result");
+            Serial.print(phReadingSensor.resultCalibration());
+        }
+        else if (command.name == "phSetVol4")
+        {
+            Serial.println("Setting vol4");
+            phReadingSensor.setVoltage(VOL_4, command.value.toFloat());
+            ConfigStoredROM::setCalibrationVol4(command.value.toFloat());
+        }
+        else if (command.name == "phSetVol6")
+        {
+            Serial.println("Setting vol6");
+            phReadingSensor.setVoltage(VOL_6, command.value.toFloat());
+            ConfigStoredROM::setCalibrationVol6(command.value.toFloat());
+        }
+        else if (command.name == "calibrateFinished")
+        {
+            Serial.println("Calibration finished");
+            StateManager::setState(INITIALIZE);
+        }
     }
-    else if (command.name == "phCalibrateVol6")
-    {
-      Serial.println("Calibrating vol6");
-      float voltage = phReadingSensor.calibrate(VOL_6);
-      ConfigStoredROM::setCalibrationVol6(voltage);
-    }
-    else if (command.name == "phCalibrate")
-    {
-      Serial.println("Calibrating");
-      phReadingSensor.calculateCalibration();
-    }
-    else if (command.name == "phCalibrateResult")
-    {
-      Serial.println("Calibration result");
-      Serial.print(phReadingSensor.resultCalibration());
-    }
-    else if (command.name == "phSetVol4")
-    {
-      Serial.println("Setting vol4");
-      phReadingSensor.setVoltage(VOL_4, command.value.toFloat());
-      ConfigStoredROM::setCalibrationVol4(command.value.toFloat());
-    }
-    else if (command.name == "phSetVol6")
-    {
-      Serial.println("Setting vol6");
-      phReadingSensor.setVoltage(VOL_6, command.value.toFloat());
-      ConfigStoredROM::setCalibrationVol6(command.value.toFloat());
-    }
-    else if (command.name == "calibrateFinished")
-    {
-      Serial.println("Calibration finished");
-      StateManager::setState(INITIALIZE);
-    }
-  }
 }
 
 void configure()
 {
-  if (Serial.available())
-  {
-    Command command = CommandManager::getCommand();
+    if (Serial.available())
+    {
+        Command command = CommandManager::getCommand();
 
-    if (command.name == "setApiKey")
-    {
-      Serial.println("Setting API key");
-      Serial.println(command.value);
-      ConfigStoredROM::setApiKey(command.value);
+        if (command.name == "setApiKey")
+        {
+            Serial.println("Setting API key");
+            Serial.println(command.value);
+            ConfigStoredROM::setApiKey(command.value);
+        }
+        else if (command.name == "configureFinished")
+        {
+            Serial.println("Configuration finished");
+            StateManager::setState(INITIALIZE);
+        }
     }
-    else if (command.name == "configureFinished")
-    {
-      Serial.println("Configuration finished");
-      StateManager::setState(INITIALIZE);
-    }
-  }
 }
 
 void reading()
 {
-  if (Serial.available())
-  {
-    Command command = CommandManager::getCommand();
-    if (command.name == "readingFinished")
+    if (Serial.available())
     {
-      Serial.println("Reading finished");
-      StateManager::setState(REPOSE);
-      readings = 1;
-      return;
+        Command command = CommandManager::getCommand();
+        if (command.name == "readingFinished")
+        {
+            Serial.println("Reading finished");
+            StateManager::setState(REPOSE);
+            readings = 1;
+            return;
+        }
     }
-  }
 
-  if (millis() - lastTime > WAIT_TIME)
-  {
-    lastTime = millis();
+    if (millis() - lastTime > WAIT_TIME)
+    {
+        lastTime = millis();
 
-    Serial.println("Reading " + String(readings));
-    readings++;
-  }
+        Serial.println("Reading " + String(readings));
+        readings++;
+    }
 }
 
 void loop()
 {
-  switch (StateManager::getState())
-  {
-  case INITIALIZE:
-    initialize();
-    break;
-  case REPOSE:
-    repose();
-    break;
-  case CALIBRATE:
-    calibrate();
-    break;
-  case CONFIGURE:
-    configure();
-    break;
-  case READING:
-    reading();
-    break;
-  }
+    switch (StateManager::getState())
+    {
+    case INITIALIZE:
+        initialize();
+        break;
+    case REPOSE:
+        repose();
+        break;
+    case CALIBRATE:
+        calibrate();
+        break;
+    case CONFIGURE:
+        configure();
+        break;
+    case READING:
+        reading();
+        break;
+    }
 }
