@@ -14,8 +14,8 @@
 
 // Pines de los sensores
 // Analog
-const int ANALOG_PIN_TURBIDITY = A0;
-const int ANALOG_PIN_TDS = A1;
+const int ANALOG_PIN_TURBIDITY = A1;
+const int ANALOG_PIN_TDS = A0;
 const int ANALOG_PIN_PH = A8;
 const int ANALOG_PIN_CONDUCTIVITY = A3;
 // Digital
@@ -221,7 +221,7 @@ void reading()
         float turbidity = sensorTurbidity.getReadingFloat();
 
         Serial.print("Color = ");
-        Serial.println(String(color.r) + "," + String(color.g) + "+" + String(color.b));
+        Serial.println(String(color.r) + "," + String(color.g) + "," + String(color.b));
         Serial.print("Conductivity = ");
         Serial.println(String(conductivity));
         Serial.print("PH = ");

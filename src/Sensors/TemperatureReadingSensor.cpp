@@ -12,5 +12,6 @@ float TemperatureReadingSensor::getReadingFloat()
 {
     ds18b20.requestTemperatures();
     float temperature = ds18b20.getTempCByIndex(0);
-    return temperature != DEVICE_DISCONNECTED_C ? temperature : NAN;
+    // return temperature != DEVICE_DISCONNECTED_C ? temperature : NAN;
+    return temperature;
 }
