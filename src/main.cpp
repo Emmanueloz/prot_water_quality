@@ -35,13 +35,13 @@ unsigned long lastTime = 0;
 unsigned int readings = 1;
 
 // Instancias de los sensores
-TurbidityReadingSensor sensorTurbidity(ANALOG_PIN_TURBIDITY);
-TotalDissolvedSolids sensorTDS(ANALOG_PIN_TDS);
-PhReadingSensor phReadingSensor(ANALOG_PIN_PH);
-ConductivityReadingSensor sensorConductivity(ANALOG_PIN_CONDUCTIVITY);
 ColorTCS3200 sensorColor(DIGITAL_PIN_S0_COLOR, DIGITAL_PIN_S1_COLOR, DIGITAL_PIN_S2_COLOR, DIGITAL_PIN_S3_COLOR,
                          DIGITAL_PIN_OUT_COLOR);
-TemperatureReadingSensor sensorTMP(DIGITAL_PIN_TEMP);
+ConductivityReadingSensor sensorConductivity(ANALOG_PIN_CONDUCTIVITY);
+PhReadingSensor sensorPH(ANALOG_PIN_PH);
+TotalDissolvedSolids sensorTDS(ANALOG_PIN_TDS);
+TemperatureReadingSensor sensorTemperature(DIGITAL_PIN_TEMP);
+TurbidityReadingSensor sensorTurbidity(ANALOG_PIN_TURBIDITY);
 
 void initialize()
 {
@@ -58,9 +58,9 @@ void initialize()
     }
     else
     {
-        phReadingSensor.setVoltage(VOL_4, config.calibrationVol4);
-        phReadingSensor.setVoltage(VOL_6, config.calibrationVol6);
-        phReadingSensor.calculateCalibration();
+        sensorPH.setVoltage(VOL_4, config.calibrationVol4);
+        sensorPH.setVoltage(VOL_6, config.calibrationVol6);
+        sensorPH.calculateCalibration();
         StateManager::setState(REPOSE);
     }
 
@@ -74,7 +74,7 @@ void setup()
     sensorTurbidity.setup();
     sensorConductivity.setup();
     sensorColor.setup();
-    sensorTMP.begin();
+    sensorTemperature.begin();
     Serial.println("Getting started");
     initialize();
 }
@@ -99,7 +99,7 @@ void repose()
         else if (command.name == "resultCalibration")
         {
             Serial.print("Result Calibration: ");
-            Serial.println(phReadingSensor.resultCalibration());
+            Serial.println(sensorPH.resultCalibration());
         }
         else if (command.name == "getStatus")
         {
@@ -134,35 +134,35 @@ void calibrate()
         if (command.name == "phCalibrateVol4")
         {
             Serial.println("Calibrating vol4");
-            float voltage = phReadingSensor.calibrate(VOL_4);
+            float voltage = sensorPH.calibrate(VOL_4);
             ConfigStoredROM::setCalibrationVol4(voltage);
         }
         else if (command.name == "phCalibrateVol6")
         {
             Serial.println("Calibrating vol6");
-            float voltage = phReadingSensor.calibrate(VOL_6);
+            float voltage = sensorPH.calibrate(VOL_6);
             ConfigStoredROM::setCalibrationVol6(voltage);
         }
         else if (command.name == "phCalibrate")
         {
             Serial.println("Calibrating");
-            phReadingSensor.calculateCalibration();
+            sensorPH.calculateCalibration();
         }
         else if (command.name == "phCalibrateResult")
         {
             Serial.println("Calibration result");
-            Serial.print(phReadingSensor.resultCalibration());
+            Serial.print(sensorPH.resultCalibration());
         }
         else if (command.name == "phSetVol4")
         {
             Serial.println("Setting vol4");
-            phReadingSensor.setVoltage(VOL_4, command.value.toFloat());
+            sensorPH.setVoltage(VOL_4, command.value.toFloat());
             ConfigStoredROM::setCalibrationVol4(command.value.toFloat());
         }
         else if (command.name == "phSetVol6")
         {
             Serial.println("Setting vol6");
-            phReadingSensor.setVoltage(VOL_6, command.value.toFloat());
+            sensorPH.setVoltage(VOL_6, command.value.toFloat());
             ConfigStoredROM::setCalibrationVol6(command.value.toFloat());
         }
         else if (command.name == "calibrateFinished")
@@ -212,6 +212,27 @@ void reading()
         lastTime = millis();
 
         Serial.println("Reading " + String(readings));
+
+        RGB color = sensorColor.getRGB();
+        float conductivity = sensorConductivity.getReadingFloat();
+        float ph = sensorPH.getReadingFloat();
+        float temperature = sensorTemperature.getReadingFloat();
+        float tds = sensorTDS.getReadingFloat(temperature);
+        float turbidity = sensorTurbidity.getReadingFloat();
+
+        Serial.print("Color = ");
+        Serial.println(String(color.r) + "," + String(color.g) + "+" + String(color.b));
+        Serial.print("Conductivity = ");
+        Serial.println(String(conductivity));
+        Serial.print("PH = ");
+        Serial.println(String(ph));
+        Serial.print("Temperature = ");
+        Serial.println(String(temperature));
+        Serial.print("TDS = ");
+        Serial.println(String(tds));
+        Serial.print("Turbidity = ");
+        Serial.println(String(turbidity));
+
         readings++;
     }
 }
