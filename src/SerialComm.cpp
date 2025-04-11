@@ -16,7 +16,7 @@ void SerialComm::send(const String &message)
     }
 }
 
-String SerialComm::receive()
+String SerialComm::receive(Keyvalue *data)
 {
     String line = "";
     if (serialPort)
