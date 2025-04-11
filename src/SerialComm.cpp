@@ -19,10 +19,19 @@ void SerialComm::send(const String &message)
 String SerialComm::receive()
 {
     String line = "";
-    if (serialPort && serialPort->available())
+    if (serialPort)
     {
         line = serialPort->readStringUntil('\n');
         line.trim();
     }
     return line;
+}
+
+String SerialComm::readLine()
+{
+    if (serialPort)
+    {
+        return serialPort->readStringUntil('\n');
+    }
+    return "";
 }

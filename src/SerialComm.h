@@ -9,6 +9,8 @@ public:
     void send(const String &message);
     String receive();
 
+    String readLine();
+
 private:
     HardwareSerial *serialPort;
 };
