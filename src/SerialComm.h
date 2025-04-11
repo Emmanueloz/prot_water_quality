@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
+#define MAX_PAIRS 10
 struct Keyvalue
 {
     String key;
@@ -10,9 +11,8 @@ class SerialComm
 {
 public:
     SerialComm();
-    void begin(HardwareSerial &serial, unsigned long baudRate);
     void send(const String &message);
-    String receive(Keyvalue *data);
+    int receive(Keyvalue *data);
 
 private:
     HardwareSerial *serialPort;

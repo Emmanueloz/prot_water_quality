@@ -1,11 +1,12 @@
 #include "SerialComm.h"
 
-SerialComm::SerialComm() : serialPort(nullptr) {}
+SerialComm::SerialComm(HardwareSerial &serial) : serialPort(serial) {}
 
-void SerialComm::begin(HardwareSerial &serial, unsigned long baudRate)
+void SerialComm::begin(long baudRate)
+
 {
-    serialPort = &serial;
-    serialPort->begin(baudRate);
+
+    serialPort.begin(baudRate);
 }
 
 void SerialComm::send(const String &message)
@@ -16,15 +17,36 @@ void SerialComm::send(const String &message)
     }
 }
 
-String SerialComm::receive(Keyvalue *data)
+int SerialComm::receive(Keyvalue *data)
 {
-    String line = "";
-    if (serialPort)
+    if (!serialPort.available())
+        return 0;
+
+    String line = readLine();
+    line.trim();
+
+    int count = 0;
+    int start = 0;
+
+    while (start < line.length() && count < MAX_PAIRS)
     {
-        line = serialPort->readStringUntil('\n');
-        line.trim();
+        int commaIndex = line.indexOf(',', start);
+        String pair = (commaIndex == -1) ? line.substring(start) : line.substring(start, commaIndex);
+        int equalIndex = pair.indexOf('=');
+
+        if (equalIndex != -1)
+        {
+            data[count].key = pair.substring(0, equalIndex);
+            data[count].value = pair.substring(equalIndex + 1);
+            count++;
+        }
+
+        if (commaIndex == -1)
+            break;
+        start = commaIndex + 1;
     }
-    return line;
+
+    return count;
 }
 
 String SerialComm::readLine()
