@@ -77,7 +77,6 @@ void setup()
     sensorConductivity.setup();
     sensorColor.setup();
     sensorTemperature.begin();
-    SerialComm comm(Serial2);
     comm.begin(9600);
 
     Serial.println("Getting started");
