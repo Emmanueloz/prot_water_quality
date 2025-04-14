@@ -3,18 +3,13 @@
 SerialComm::SerialComm(HardwareSerial &serial) : serialPort(serial) {}
 
 void SerialComm::begin(long baudRate)
-
 {
-
     serialPort.begin(baudRate);
 }
 
 void SerialComm::send(const String &message)
 {
-    if (serialPort)
-    {
-        serialPort->println(message);
-    }
+    serialPort.println(message);
 }
 
 int SerialComm::receive(Keyvalue *data)
@@ -53,7 +48,7 @@ String SerialComm::readLine()
 {
     if (serialPort)
     {
-        return serialPort->readStringUntil('\n');
+        return serialPort.readStringUntil('\n');
     }
     return "";
 }

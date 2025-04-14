@@ -43,7 +43,7 @@ TotalDissolvedSolids sensorTDS(ANALOG_PIN_TDS);
 TemperatureReadingSensor sensorTemperature(DIGITAL_PIN_TEMP);
 TurbidityReadingSensor sensorTurbidity(ANALOG_PIN_TURBIDITY);
 
-SerialComm comm;
+SerialComm comm(Serial2);
 
 void initialize()
 {
@@ -77,8 +77,8 @@ void setup()
     sensorConductivity.setup();
     sensorColor.setup();
     sensorTemperature.begin();
-
-    comm.begin(Serial2, 9600);
+    SerialComm comm(Serial2);
+    comm.begin(9600);
 
     Serial.println("Getting started");
     initialize();
