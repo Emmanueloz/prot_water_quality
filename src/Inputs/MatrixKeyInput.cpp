@@ -1,14 +1,33 @@
 #include "MatrixKeyInput.h"
 
-MatrixKeyInput::MatrixKeyInput()
+MatrixKeyInput::MatrixKeyInput(byte *pinRows, byte *pinCols)
 {
+    MatrixKeyInput::pinRows = pinRows;
+    MatrixKeyInput::pinCols = pinCols;
+
+    this->keypad = new Keypad(makeKeymap(keys), pinRows, pinCols, ROWS, COLS);
 }
 
-void MatrixKeyInput::setup()
+char MatrixKeyInput::getKey()
 {
+    return this->keypad->getKey();
 }
 
-String MatrixKeyInput::getReading()
+bool MatrixKeyInput::equalMessage(String message)
 {
-    return String();
+    char key = this->getKey();
+
+    if (key == NO_KEY)
+    {
+        return false;
+    }
+
+    message += key;
+
+    return message == this->message;
+}
+
+void MatrixKeyInput::clearMessage()
+{
+    this->message = "";
 }
