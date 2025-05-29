@@ -23,7 +23,7 @@ int SerialComm::receive(Keyvalue *data)
     int count = 0;
     int start = 0;
 
-    while (start < line.length() && count < MAX_PAIRS)
+    while (start < static_cast<int>(line.length()) && count < MAX_PAIRS)
     {
         int commaIndex = line.indexOf(',', start);
         String pair = (commaIndex == -1) ? line.substring(start) : line.substring(start, commaIndex);

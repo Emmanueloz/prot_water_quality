@@ -48,15 +48,22 @@ SerialComm comm(Serial2);
 void initialize()
 {
     Config config = ConfigStoredROM::getConfig();
-    if (strlen(config.apiKey) == 0)
+    if (!ConfigStoredROM::isValidString(config.apiKey, sizeof(config.apiKey)))
     {
         Serial.println("No API key");
         StateManager::setState(CONFIGURE);
     }
-    else if (config.calibrationVol4 == 0.0 || config.calibrationVol6 == 0.0)
+    else if (!ConfigStoredROM::isValidFloat(config.calibrationVol4) || !ConfigStoredROM::isValidFloat(config.calibrationVol6))
     {
         Serial.println("No calibration");
         StateManager::setState(CALIBRATE);
+    }
+    else if (
+        !ConfigStoredROM::isValidString(config.wifiSSID, sizeof(config.wifiSSID)) ||
+        !ConfigStoredROM::isValidString(config.wifiPassword, sizeof(config.wifiPassword)))
+    {
+        Serial.println("No WiFi");
+        StateManager::setState(CONFIGURE);
     }
     else
     {
@@ -99,6 +106,10 @@ void repose()
             Serial.println(config.calibrationVol4);
             Serial.print("Calibration Vol6: ");
             Serial.println(config.calibrationVol6);
+            Serial.print("WiFi SSID: ");
+            Serial.println(config.wifiSSID);
+            Serial.print("WiFi Password: ");
+            Serial.println(config.wifiPassword);
         }
         else if (command.name == "resultCalibration")
         {
@@ -189,6 +200,19 @@ void configure()
             Serial.println(command.value);
             ConfigStoredROM::setApiKey(command.value);
         }
+        else if (command.name == "setWifiSsid")
+        {
+            Serial.println("Setting WiFi SSID");
+            Serial.println(command.value);
+            ConfigStoredROM::setWifiSSID(command.value);
+        }
+        else if (command.name == "setWifiPassword")
+        {
+            Serial.println("Setting WiFi Password");
+            Serial.println(command.value);
+            ConfigStoredROM::setWifiPassword(command.value);
+        }
+
         else if (command.name == "configureFinished")
         {
             Serial.println("Configuration finished");
@@ -206,6 +230,7 @@ void reading()
         {
             Serial.println("Reading finished");
             StateManager::setState(REPOSE);
+            comm.send("state=repose");
             readings = 1;
             return;
         }
@@ -224,19 +249,16 @@ void reading()
         float tds = sensorTDS.getReadingFloat(temperature);
         float turbidity = sensorTurbidity.getReadingFloat();
 
-        Serial.print("Color = ");
-        Serial.println(String(color.r) + "," + String(color.g) + "," + String(color.b));
-        Serial.print("Conductivity = ");
-        Serial.println(String(conductivity));
-        Serial.print("PH = ");
-        Serial.println(String(ph));
-        Serial.print("Temperature = ");
-        Serial.println(String(temperature));
-        Serial.print("TDS = ");
-        Serial.println(String(tds));
-        Serial.print("Turbidity = ");
-        Serial.println(String(turbidity));
-        comm.send("tds=" + String(tds));
+        String recordMessage = "state=reading,colorR=" + String(color.r) +
+                               ",colorG=" + String(color.g) +
+                               ",colorB=" + String(color.b) +
+                               ",conductivity=" + String(conductivity) +
+                               ",ph=" + String(ph) +
+                               ",temperature=" + String(temperature) +
+                               ",tds=" + String(tds) +
+                               ",turbidity=" + String(turbidity);
+
+        comm.send(recordMessage);
 
         readings++;
     }
