@@ -48,15 +48,23 @@ SerialComm comm(Serial2);
 void initialize()
 {
     Config config = ConfigStoredROM::getConfig();
-    if (strlen(config.apiKey) == 0)
+    Serial.println("Initializing");
+    if (!ConfigStoredROM::isValidJWT(config.apiKey, sizeof(config.apiKey)))
     {
-        Serial.println("No API key");
+        Serial.println("Invalid or missing API key");
         StateManager::setState(CONFIGURE);
     }
-    else if (config.calibrationVol4 == 0.0 || config.calibrationVol6 == 0.0)
+    else if (!ConfigStoredROM::isValidFloat(config.calibrationVol4) || !ConfigStoredROM::isValidFloat(config.calibrationVol6))
     {
         Serial.println("No calibration");
         StateManager::setState(CALIBRATE);
+    }
+    else if (
+        !ConfigStoredROM::isValidString(config.wifiSSID, sizeof(config.wifiSSID)) ||
+        !ConfigStoredROM::isValidString(config.wifiPassword, sizeof(config.wifiPassword)))
+    {
+        Serial.println("No WiFi");
+        StateManager::setState(CONFIGURE);
     }
     else
     {
@@ -99,6 +107,10 @@ void repose()
             Serial.println(config.calibrationVol4);
             Serial.print("Calibration Vol6: ");
             Serial.println(config.calibrationVol6);
+            Serial.print("WiFi SSID: ");
+            Serial.println(config.wifiSSID);
+            Serial.print("WiFi Password: ");
+            Serial.println(config.wifiPassword);
         }
         else if (command.name == "resultCalibration")
         {
@@ -120,10 +132,16 @@ void repose()
             Serial.println("Calibrate");
             StateManager::setState(CALIBRATE);
         }
+
         else if (command.name == "reading")
         {
             Serial.println("Reading started");
-            StateManager::setState(READING);
+            Config config = ConfigStoredROM::getConfig();
+            String apiKey = config.apiKey;
+            String wifiSSID = config.wifiSSID;
+            String wifiPassword = config.wifiPassword;
+
+            comm.send("command=connectInit,apiKey=" + String(apiKey) + ",ssid=" + wifiSSID + ",password=" + wifiPassword);
             lastTime = millis();
         }
     }
@@ -182,6 +200,7 @@ void configure()
     if (Serial.available())
     {
         Command command = CommandManager::getCommand();
+        Serial.println("Received command: " + command.name + " with value: " + command.value);
 
         if (command.name == "setApiKey")
         {
@@ -189,6 +208,19 @@ void configure()
             Serial.println(command.value);
             ConfigStoredROM::setApiKey(command.value);
         }
+        else if (command.name == "setWifiSsid")
+        {
+            Serial.println("Setting WiFi SSID");
+            Serial.println(command.value);
+            ConfigStoredROM::setWifiSSID(command.value);
+        }
+        else if (command.name == "setWifiPassword")
+        {
+            Serial.println("Setting WiFi Password");
+            Serial.println(command.value);
+            ConfigStoredROM::setWifiPassword(command.value);
+        }
+
         else if (command.name == "configureFinished")
         {
             Serial.println("Configuration finished");
@@ -206,6 +238,7 @@ void reading()
         {
             Serial.println("Reading finished");
             StateManager::setState(REPOSE);
+            comm.send("command=seenFinished");
             readings = 1;
             return;
         }
@@ -224,26 +257,78 @@ void reading()
         float tds = sensorTDS.getReadingFloat(temperature);
         float turbidity = sensorTurbidity.getReadingFloat();
 
-        Serial.print("Color = ");
-        Serial.println(String(color.r) + "," + String(color.g) + "," + String(color.b));
-        Serial.print("Conductivity = ");
-        Serial.println(String(conductivity));
-        Serial.print("PH = ");
-        Serial.println(String(ph));
-        Serial.print("Temperature = ");
-        Serial.println(String(temperature));
-        Serial.print("TDS = ");
-        Serial.println(String(tds));
-        Serial.print("Turbidity = ");
-        Serial.println(String(turbidity));
-        comm.send("tds=" + String(tds));
+        String recordMessage = "command=seen,colorR=" + String(color.r) +
+                               ",colorG=" + String(color.g) +
+                               ",colorB=" + String(color.b) +
+                               ",conductivity=" + String(conductivity) +
+                               ",ph=" + String(ph) +
+                               ",temperature=" + String(temperature) +
+                               ",tds=" + String(tds) +
+                               ",turbidity=" + String(turbidity);
+
+        comm.send(recordMessage);
 
         readings++;
     }
 }
 
+void handleResponse()
+{
+
+    Keyvalue response[MAX_PAIRS];
+    int count = comm.receive(response);
+
+    for (int i = 0; i < count; i++)
+    {
+        String key = response[i].key;
+        String value = response[i].value;
+
+        if (key == "response")
+        {
+            if (value == "seenSuccess")
+            {
+                Serial.println("Reading successful");
+            }
+            else if (value == "seenError")
+            {
+                Serial.println("Reading error");
+                StateManager::setState(REPOSE);
+            }
+            else if (value == "connecting")
+            {
+                Serial.println("Connecting to WiFi");
+            }
+            else if (value == "connectWifiSuccess")
+            {
+                Serial.println("Connected WiFi successfully");
+            }
+            else if (value == "connectingSocket")
+            {
+                Serial.println("Connecting to socket");
+            }
+            else if (value == "socketConnected")
+            {
+                Serial.println("Connected to socket");
+                StateManager::setState(READING);
+            }
+            else if (value == "socketDisconnected")
+            {
+                Serial.println("Disconnected from socket");
+                StateManager::setState(REPOSE);
+            }
+            else if (value == "connectError")
+            {
+                Serial.println("Connection error");
+                StateManager::setState(REPOSE);
+            }
+        }
+    }
+}
+
 void loop()
 {
+    handleResponse();
+
     switch (StateManager::getState())
     {
     case INITIALIZE:
