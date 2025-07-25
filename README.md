@@ -105,7 +105,9 @@ src/
 - `socketDisconnected`: Indicates server disconnection
 - `connectError`: Indicates connection error
 
-## 🌿 Branching Strategy
+## 🤝 Contributing
+
+### 🌿 Branching Strategy
 
 | Branch            | Description                            | Allowed commit types                 |
 | ----------------- | -------------------------------------- | ------------------------------------ |
@@ -116,7 +118,7 @@ src/
 | `refactor/<name>` | Code improvements without logic change | `refactor`, `style`, `docs`, `chore` |
 | `docs/<name>`     | Documentation updates                  | `docs`                               |
 
-## ✍️ Commit types (Conventional Commits)
+### ✍️ Commit types (Conventional Commits)
 
 We use the [Conventional Commits](https://www.conventionalcommits.org/) format to improve readability of history.
 
@@ -129,8 +131,6 @@ We use the [Conventional Commits](https://www.conventionalcommits.org/) format t
 | `test`     | Add or modify tests                                   | `test: add unit tests for sensor reading validation`   |
 | `style`    | Code formatting or styling (no logic changes)         | `style: apply consistent coding style`                 |
 | `chore`    | Maintenance tasks that do not affect code logic       | `chore: update dependencies to latest version`         |
-
-## 🤝 Contributing
 
 Contributions are welcome. Please ensure to follow Arduino programming best practices and document your changes appropriately.
 
