@@ -48,9 +48,10 @@ SerialComm comm(Serial2);
 void initialize()
 {
     Config config = ConfigStoredROM::getConfig();
-    if (!ConfigStoredROM::isValidString(config.apiKey, sizeof(config.apiKey)))
+    Serial.println("Initializing");
+    if (!ConfigStoredROM::isValidJWT(config.apiKey, sizeof(config.apiKey)))
     {
-        Serial.println("No API key");
+        Serial.println("Invalid or missing API key");
         StateManager::setState(CONFIGURE);
     }
     else if (!ConfigStoredROM::isValidFloat(config.calibrationVol4) || !ConfigStoredROM::isValidFloat(config.calibrationVol6))
@@ -297,10 +298,23 @@ void handleResponse()
             {
                 Serial.println("Connecting to WiFi");
             }
-            else if (value == "connectSuccess")
+            else if (value == "connectWifiSuccess")
             {
-                Serial.println("Connected successfully");
+                Serial.println("Connected WiFi successfully");
+            }
+            else if (value == "connectingSocket")
+            {
+                Serial.println("Connecting to socket");
+            }
+            else if (value == "socketConnected")
+            {
+                Serial.println("Connected to socket");
                 StateManager::setState(READING);
+            }
+            else if (value == "socketDisconnected")
+            {
+                Serial.println("Disconnected from socket");
+                StateManager::setState(REPOSE);
             }
             else if (value == "connectError")
             {
