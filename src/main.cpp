@@ -132,7 +132,11 @@ void repose()
             Serial.println("Calibrate");
             StateManager::setState(CALIBRATE);
         }
-
+        else if (command.name == "connectBluetooth")
+        {
+            Serial.println("Connecting to bluetooth");
+            comm.send("command=connectBluetooth");
+        }
         else if (command.name == "reading")
         {
             Serial.println("Reading started");
