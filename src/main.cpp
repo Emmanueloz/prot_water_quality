@@ -91,11 +91,20 @@ void setup()
     initialize();
 }
 
-void repose()
+void repose(Command *response, int count)
 {
-    if (Serial.available())
+    if (Serial.available() || count > 0)
     {
-        Command command = CommandManager::getCommand();
+        Command command;
+        if (count > 0)
+        {
+            command.name = response[0].name;
+            command.value = response[0].value;
+        }
+        else
+        {
+            command = CommandManager::getCommand();
+        }
 
         if (command.name == "getConfig")
         {
@@ -151,11 +160,20 @@ void repose()
     }
 }
 
-void calibrate()
+void calibrate(Command *response, int count)
 {
-    if (Serial.available())
+    if (Serial.available() || count > 0)
     {
-        Command command = CommandManager::getCommand();
+        Command command;
+        if (count > 0)
+        {
+            command.name = response[0].name;
+            command.value = response[0].value;
+        }
+        else
+        {
+            command = CommandManager::getCommand();
+        }
 
         if (command.name == "phCalibrateVol4")
         {
@@ -169,16 +187,7 @@ void calibrate()
             float voltage = sensorPH.calibrate(VOL_6);
             ConfigStoredROM::setCalibrationVol6(voltage);
         }
-        else if (command.name == "phCalibrate")
-        {
-            Serial.println("Calibrating");
-            sensorPH.calculateCalibration();
-        }
-        else if (command.name == "phCalibrateResult")
-        {
-            Serial.println("Calibration result");
-            Serial.print(sensorPH.resultCalibration());
-        }
+
         else if (command.name == "phSetVol4")
         {
             Serial.println("Setting vol4");
@@ -194,16 +203,29 @@ void calibrate()
         else if (command.name == "calibrateFinished")
         {
             Serial.println("Calibration finished");
+            sensorPH.calculateCalibration();
+            Serial.println("Calibration result");
+            Serial.print(sensorPH.resultCalibration());
             StateManager::setState(INITIALIZE);
         }
     }
 }
 
-void configure()
+void configure(Command *response, int count)
 {
-    if (Serial.available())
+    if (Serial.available() || count > 0)
     {
-        Command command = CommandManager::getCommand();
+        Command command;
+        if (count > 0)
+        {
+            command.name = response[0].name;
+            command.value = response[0].value;
+        }
+        else
+        {
+            command = CommandManager::getCommand();
+        }
+
         Serial.println("Received command: " + command.name + " with value: " + command.value);
 
         if (command.name == "setApiKey")
@@ -233,11 +255,20 @@ void configure()
     }
 }
 
-void reading()
+void reading(Command *response, int count)
 {
-    if (Serial.available())
+    if (Serial.available() || count > 0)
     {
-        Command command = CommandManager::getCommand();
+        Command command;
+        if (count > 0)
+        {
+            command.name = response[0].name;
+            command.value = response[0].value;
+        }
+        else
+        {
+            command = CommandManager::getCommand();
+        }
         if (command.name == "readingFinished")
         {
             Serial.println("Reading finished");
@@ -276,15 +307,12 @@ void reading()
     }
 }
 
-void handleResponse()
+void handleResponse(Command *response, int count)
 {
-
-    Keyvalue response[MAX_PAIRS];
-    int count = comm.receive(response);
 
     for (int i = 0; i < count; i++)
     {
-        String key = response[i].key;
+        String key = response[i].name;
         String value = response[i].value;
 
         if (key == "response")
@@ -331,7 +359,10 @@ void handleResponse()
 
 void loop()
 {
-    handleResponse();
+    Command response[MAX_PAIRS];
+    int count = comm.receive(response);
+
+    handleResponse(response, count);
 
     switch (StateManager::getState())
     {
@@ -339,16 +370,16 @@ void loop()
         initialize();
         break;
     case REPOSE:
-        repose();
+        repose(response, count);
         break;
     case CALIBRATE:
-        calibrate();
+        calibrate(response, count);
         break;
     case CONFIGURE:
-        configure();
+        configure(response, count);
         break;
     case READING:
-        reading();
+        reading(response, count);
         break;
     }
 }

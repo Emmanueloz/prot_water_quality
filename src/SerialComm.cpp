@@ -12,7 +12,7 @@ void SerialComm::send(const String &message)
     serialPort.println(message);
 }
 
-int SerialComm::receive(Keyvalue *data)
+int SerialComm::receive(Command *data)
 {
     if (!serialPort.available())
         return 0;
@@ -31,13 +31,19 @@ int SerialComm::receive(Keyvalue *data)
 
         if (equalIndex != -1)
         {
-            data[count].key = pair.substring(0, equalIndex);
+            data[count].name = pair.substring(0, equalIndex);
             data[count].value = pair.substring(equalIndex + 1);
             count++;
         }
 
         if (commaIndex == -1)
+        {
+            data[count].name = pair;
+            data[count].value = "";
+            count++;
             break;
+        }
+
         start = commaIndex + 1;
     }
 
