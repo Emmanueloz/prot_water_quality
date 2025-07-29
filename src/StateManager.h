@@ -3,9 +3,6 @@
 
 enum State
 {
-    INITIALIZE,
-    REPOSE,
-    CALIBRATE,
     CONFIGURE,
     READING
 };

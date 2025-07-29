@@ -1,6 +1,6 @@
 #include "StateManager.h"
 
-State StateManager::_state = INITIALIZE;
+State StateManager::_state = CONFIGURE;
 
 void StateManager::setState(State state)
 {
@@ -16,12 +16,6 @@ String StateManager::getStateString()
 {
     switch (StateManager::getState())
     {
-    case INITIALIZE:
-        return "INITIALIZE";
-    case REPOSE:
-        return "REPOSE";
-    case CALIBRATE:
-        return "CALIBRATE";
     case CONFIGURE:
         return "CONFIGURE";
     case READING:
