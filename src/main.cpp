@@ -115,7 +115,7 @@ void configure(Command *response, int count)
             command = CommandManager::getCommand();
         }
 
-        Serial.println("Received command: " + command.name + " with value: " + command.value);
+        // Serial.println("Received command: " + command.name + " with value: " + command.value);
 
         if (command.name == "getConfig")
         {
@@ -131,21 +131,18 @@ void configure(Command *response, int count)
             Serial.println(config.wifiSSID);
             Serial.print("WiFi Password: ");
             Serial.println(config.wifiPassword);
+            Serial.print("State: ");
+            Serial.println(StateManager::getStateString());
+
+            comm.send("command=sendBluetooth,apiKey=" + String(config.apiKey) + ",calibrationVol4=" + String(config.calibrationVol4) +
+                      ",calibrationVol6=" + String(config.calibrationVol6) + ",wifiSSID=" + String(config.wifiSSID) +
+                      ",wifiPassword=" + String(config.wifiPassword) + ",state=" + String(StateManager::getStateString()));
         }
         else if (command.name == "resultCalibration")
         {
             Serial.print("Result Calibration: ");
             Serial.println(sensorPH.resultCalibration());
-        }
-        else if (command.name == "getStatus")
-        {
-            Serial.print("State: ");
-            Serial.println(StateManager::getStateString());
-        }
-        else if (command.name == "configure")
-        {
-            Serial.println("Configure");
-            StateManager::setState(CONFIGURE);
+            comm.send("resultCalibration=" + String(sensorPH.resultCalibration()));
         }
         else if (command.name == "connectBluetooth")
         {
