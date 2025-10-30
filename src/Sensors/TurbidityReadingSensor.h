@@ -11,6 +11,7 @@ public:
     void setup();
     void calibrate();
     String resultCalibration();
+    float voltageToNTU(float voltage);
     String getReading();
     int getReadingInt();
     float getReadingFloat();
