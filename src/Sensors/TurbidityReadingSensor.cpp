@@ -24,16 +24,34 @@ int TurbidityReadingSensor::getReadingInt()
     return analogRead(sensorPin);
 }
 
+// 🔹 Modificada: ahora devuelve NTU directamente en vez de voltaje
 float TurbidityReadingSensor::getReadingFloat()
 {
     int sensorValue = analogRead(sensorPin);
-    return sensorValue * (5.0 / 1024.0);
+    float voltage = sensorValue * (5.0 / 1024.0);
+    float ntu = voltageToNTU(voltage);
+    return ntu;
+}
+
+// Nueva función: convierte voltaje a NTU
+float TurbidityReadingSensor::voltageToNTU(float voltage)
+{
+    // Fórmula empírica para el sensor de turbidez
+    float ntu = -1120.4 * voltage * voltage + 5742.3 * voltage - 4352.9;
+
+    // Asegurar que el valor no sea negativo
+    if (ntu < 0) ntu = 0;
+
+    return ntu;
 }
 
 String TurbidityReadingSensor::getReading()
 {
     int sensorValue = getReadingInt();
-    float voltage = getReadingFloat();
+    float voltage = sensorValue * (5.0 / 1024.0);
+    float ntu = voltageToNTU(voltage);
 
-    return "Raw: " + String(sensorValue) + " | Voltage: " + String(voltage) + " V";
+    return "Raw: " + String(sensorValue) +
+           " | Voltage: " + String(voltage, 2) + " V" +
+           " | NTU: " + String(ntu, 2);
 }
